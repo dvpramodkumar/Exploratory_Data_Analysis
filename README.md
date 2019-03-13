@@ -9,12 +9,12 @@ my_packages <- c("tidyverse", "broom", "coefplot", "cowplot",
 "mapdata", "MASS", "quantreg", "rlang", "scales",
 "survey", "srvyr", "viridis", "viridisLite", "devtools")
 
-#install.packages(my_packages, repos = "http://cran.rstudio.com")
+install.packages(my_packages, repos = "http://cran.rstudio.com")
 ```
 
 ```{r}
-#library('devtools')
-#devtools::install_github("kjhealy/socviz")
+library('devtools')
+devtools::install_github("kjhealy/socviz")
 ```
 
 ### Other resources:
