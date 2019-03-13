@@ -1,0 +1,60 @@
+---
+title: "Introduction to Visualization in R"
+author: "Pramod Duvvuri"
+date: "3/11/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library('lattice')
+library('ggplot2')
+```
+
+```{r}
+ggplot(singer, aes(x = height))
+```
+
+```{r}
+# ECDF in ggplot2
+ggplot(singer, aes(x = height)) + stat_ecdf()
+```
+
+```{r}
+# Alternate way to get ECDF
+singer_gg <- ggplot(singer, aes(x = height))
+singer_gg + stat_ecdf()
+```
+
+```{r}
+# Add Labels
+singer_gg + stat_ecdf() + ggtitle('ECDF')
+```
+
+```{r}
+# Histogram
+#ggplot(singer, aes(x= height)) + geom_histogram()
+ggplot(singer, aes(x= height)) + geom_histogram(binwidth = 1)
+```
+
+```{r}
+# Density Plot
+ggplot(singer, aes(x= height)) + geom_density()
+ggplot(singer, aes(x= height)) + geom_density(adjust = 0.5)
+```
+
+```{r}
+# Boxplot 
+ggplot(singer, aes(x= "Height", y = height)) + geom_boxplot()
+```
+
+```{r}
+# Multiple Boxplots
+ggplot(singer, aes(x = voice.part, y = height)) + geom_boxplot()
+```
+
