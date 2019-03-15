@@ -1,5 +1,5 @@
 ---
-title: "Introduction to Visualization in R"
+title: "Introduction to EDA"
 author: "Pramod Duvvuri"
 date: "3/11/2019"
 output:
@@ -9,9 +9,13 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=9, fig.height=5) 
 ```
 
+## Learning ggplot2
+
 ```{r}
+# Load installed packages
 library('lattice')
 library('ggplot2')
 ```
@@ -24,6 +28,8 @@ ggplot(singer, aes(x = height))
 # ECDF in ggplot2
 ggplot(singer, aes(x = height)) + stat_ecdf()
 ```
+
+### Basic Plots
 
 ```{r}
 # Alternate way to get ECDF
@@ -56,5 +62,27 @@ ggplot(singer, aes(x= "Height", y = height)) + geom_boxplot()
 ```{r}
 # Multiple Boxplots
 ggplot(singer, aes(x = voice.part, y = height)) + geom_boxplot()
+```
+
+```{r}
+# QQ-Plot using a Normal Distribution
+ggplot(singer, aes(sample = height)) + stat_qq()
+```
+
+```{r}
+# QQ-Plot using a Uniform Distribution
+ggplot(singer, aes(sample = height)) + stat_qq(distribution = qunif)
+```
+
+```{r}
+# Facet
+ggplot(singer,aes(sample = height)) + stat_qq(distribution = qunif) +
+  facet_grid(~voice.part)
+```
+
+```{r}
+# Facet with grid display
+ggplot(singer, aes(sample = height)) + stat_qq(distribution = qunif) + 
+  facet_wrap(~voice.part, ncol = 2)
 ```
 
