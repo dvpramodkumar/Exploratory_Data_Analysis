@@ -15,6 +15,5 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("tidyverse") # One line install
 # tidyverse_update()           # To update the outdated packages
 library(tidyverse)             # Load the Library
-
 ```
 

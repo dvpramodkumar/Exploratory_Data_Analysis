@@ -1,6 +1,10 @@
 ## Exploratory_Data_Analysis
 
-This repo contains code from the Exploratory Data Analysis course at Indiana University (STAT-S 670)
+This repo contains code from different sources. They are:
+1. Exploratory Data Analysis (EDA) course at Indiana University (STAT-S 670)
+2. R for Data Science code snippets
+
+The packages required to run the code in this repo can be installed using the commands below in a RStudio.
 
 ```{R Code}
 my_packages <- c("tidyverse", "broom", "coefplot", "cowplot",
