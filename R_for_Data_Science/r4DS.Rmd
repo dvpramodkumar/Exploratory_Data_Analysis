@@ -1,0 +1,20 @@
+---
+title: "R for Data Science"
+author: "Pramod Duvvuri"
+date: "3/22/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+#install.packages("tidyverse") # One line install
+# tidyverse_update()           # To update the outdated packages
+library(tidyverse)             # Load the Library
+
+```
+
