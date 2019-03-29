@@ -379,6 +379,7 @@ ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
 The above plot can also be plotted using the geom_jitter function. This jitter avoids overplotting and adds a small amount on random noise to each point.
 
 Q. What’s the default position adjustment for geom_boxplot()? Create a visualisation of the mpg dataset that demonstrates it.
+
 ```{r}
 ggplot(data = mpg, mapping = aes(x = drv, y = hwy)) + geom_boxplot()
 ```

@@ -1,0 +1,53 @@
+---
+title: "Transforming Data in R"
+author: "Pramod Duvvuri"
+date: "3/29/2019"
+output:
+  pdf_document: 
+    fig_caption: yes
+  word_document: default
+---
+
+## Data Manipulation in R
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=9, fig.height=5)
+```
+
+```{r}
+library(nycflights13) # Data to be used
+library(tidyverse)
+```
+
+```{r}
+nycflights13::flights
+attach(flights)
+?flights
+```
+
+### Basics of dplyr
+
+The below functions will be covered in this file.
+```{r, eval=FALSE}
+1. filter()
+2. arrange()
+3. select()
+4. mutate()
+5. summarise()
+6. group_by()
+```
+
+### filter()
+
+```{r}
+# Select all flights on January 1st
+filter(flights, month == 1, day == 1)
+```
+
+```{r}
+jan_1_data <- filter(flights, month == 1, day == 1)
+# To assing the data to another variable and print to console
+(dec25_data <- filter(flights, month == 12, day == 25))
+```
+
