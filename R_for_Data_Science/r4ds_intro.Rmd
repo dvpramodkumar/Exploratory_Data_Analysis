@@ -1,15 +1,209 @@
 ---
-title: "Introduction to Data Visualization"
+title: "Introduction to Visualization in R"
 author: "Pramod Duvvuri"
 date: "3/22/2019"
 output: pdf_document
 ---
 
+## Introduction to ggplot2
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=9, fig.height=5)
+```
+
+```{r render=FALSE}
+library(tidyverse)
 ```
 
 ```{r}
-library(tidyverse)
+mpg
+attach(mpg)
 ```
+
+```{r eval=FALSE}
+# ggplot2 TEMPLATE
+ggplot(data = <DATA>) + <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+```
+
+```{r}
+# Add data points
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+### Exercises-1
+
+```{r}
+# Question-1
+ggplot(data = mpg)
+```
+
+```{r}
+# Question-2
+nrow(mpg) # Rows
+ncol(mpg) # Columns
+```
+
+```{r eval=FALSE}
+# Question-3
+?mpg
+# Answer: f = front-wheel drive, r = rear wheel drive, 4 = 4wd
+```
+
+```{r}
+# Question-4
+ggplot(data = mpg) + geom_point(mapping = aes(x = cyl, y = hwy))
+```
+
+```{r}
+# Question-5
+ggplot(data = mpg) + geom_point(mapping = aes(x = class, y = drv))
+```
+
+## Aesthetic Mappings
+
+```{r}
+# Adding aesthetic to the plot (color/size/shape could be used here)
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy,
+                                              color = class))
+```
+
+```{r}
+# Using size as aesthetic instead of color
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy,
+                                              size = class))
+```
+
+```{r}
+# Alpha and Shape Aesthetics
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy,
+                                              alpha = class))
+
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy,
+                                              shape = class))
+```
+
+
+```{r}
+# Using a different color for the data points
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy), 
+                                              color = "blue") 
+```
+
+### Exercises-2
+
+Q1. What’s gone wrong with this code? Why are the points not blue? 
+```{r}
+# color should be outside aes()
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
+```
+
+Q2. Which variables in mpg are categorical? Which variables are continuous? (Hint: type ?mpg to read the documentation for the dataset). How can you see this information when you run mpg?
+```{r}
+summary(mpg)
+```
+
+Q3. Map a continuous variable to color, size, and shape. How do these aesthetics behave differently for categorical vs. continuous variables?
+```{r}
+# Mapping a continuos variable to color
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, 
+                                             color = cyl))
+```
+
+```{r eval=FALSE}
+# Shape cannot be mapped, the line below throws an error
+#ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, 
+#                                             shape = cty))
+```
+
+```{r}
+# Mapping a continuos variable to size
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, 
+                                             size = cyl))
+```
+
+```{r}
+# Mapping same variable to multiple aesthetics (Discrete Variable)
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, 
+                                             color = trans, size = trans))
+```
+
+```{r}
+# Mapping same variable to multiple aesthetics (Continuos Variable)
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, 
+                                             color = cty, size = cty))
+```
+
+Q. What does the stroke aesthetic do? What shapes does it work with? (Hint: use ?geom_point)
+```{r}
+?geom_point # stroke aesthetic
+```
+
+Q. What happens if you map an aesthetic to something other than a variable name, like aes(colour = displ < 5)? Note, you’ll also need to specify x and y. 
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, 
+                                             color = displ < 5))
+```
+
+## Facets
+
+```{r}
+# Original Plot
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+```{r}
+# Using facet_wrap()
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 2)
+```
+
+```{r}
+# Using facet_grid()
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(drv ~ cyl)
+```
+
+```{r}
+# Using facet_grid()
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(. ~ cyl)
+```
+
+### Exercises-3
+
+Q1. What happens if you facet on a continuous variable?
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ cty, nrow = 2)
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = drv, y = cyl))
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ .)
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(. ~ cyl)
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 2)
+```
+
+```{r}
+?facet_grid
+```
+
+## Geometric Objects
 
