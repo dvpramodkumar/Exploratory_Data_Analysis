@@ -46,8 +46,273 @@ filter(flights, month == 1, day == 1)
 ```
 
 ```{r}
-jan_1_data <- filter(flights, month == 1, day == 1)
+jan_1_data <- filter(flights, month == 1, day == 1) # Can use view(jan_1_data) to see the data
+
 # To assing the data to another variable and print to console
 (dec25_data <- filter(flights, month == 12, day == 25))
+```
+
+```{r, eval=FALSE}
+filter(flights, month = 4) # throws an error (must use ==)
+```
+
+```{r}
+sqrt(2) ^ 2 == 2
+1 / 49 * 49 == 1
+```
+
+```{r}
+# Use near() for approximation
+near(sqrt(2) ^ 2, 2)
+near(1 / 49 * 49, 1)
+```
+
+```{r}
+# Using filter() with logical operators
+filter(flights, month == 4 | month == 6)
+# Alternate way to write the above line of code
+apr_jun_data <- filter(flights, month %in% c(4,7))
+nrow(apr_jun_data)
+```
+
+```{r}
+# Missing Values
+NA == NA
+# Adding some context
+x <- NA # Age of Person 1
+y <- NA # Age of Person 2
+x == y # Compare
+is.na(x)
+```
+
+```{r}
+# Handling Missing Values using filter()
+df <- tibble(x = c(19,27,32,NA))
+filter(df, x > 1) # NA excluded
+filter(df, is.na(x) | x > 1)
+```
+
+### Exercises
+
+Q1. Find all flights that
+
+Q1.1 Had an arrival delay of two or more hours
+```{r}
+filter(flights, arr_delay >= 120)
+```
+
+
+Q1.2 Flew to Houston (IAH or HOU)
+```{r}
+filter(flights, dest %in% c('IAH','HOU'))
+```
+
+
+Q1.3 Were operated by United, American, or Delta
+```{r}
+filter(flights, carrier %in% c('AA','DL','UA'))
+```
+
+
+Q1.4 Departed in summer (July, August, and September)
+```{r}
+filter(flights, month %in% c(7,8,9))
+```
+
+
+Q1.5 Arrived more than two hours late, but didn’t leave late
+```{r}
+filter(flights, arr_delay > 120, dep_delay <= 0)
+```
+
+
+Q1.6 Were delayed by at least an hour, but made up over 30 minutes in flight
+```{r}
+filter(flights, dep_delay > 60, arr_delay < 30)
+```
+
+
+Q1.7 Departed between midnight and 6am (inclusive)
+```{r}
+filter(flights,dep_time >= 0000 & dep_time <= 0600)
+```
+
+
+```{r}
+# Using between() for filtering
+sum(between(flights$dep_time, 0000, 0600), na.rm = TRUE)
+```
+
+### arrange()
+
+```{r}
+arrange(flights, year, month, day)
+```
+
+```{r}
+# Descending Order
+arrange(flights, desc(dep_delay))
+```
+
+```{r}
+# Missing Values (stored in the end)
+df <- tibble(x = c(5, 2, NA))
+arrange(df, x)
+arrange(df, desc(x))
+```
+
+### Exercises
+
+
+Q1. How could you use arrange() to sort all missing values to the start? (Hint: use is.na()).
+```{r}
+arrange(df, desc(is.na(x)))
+```
+
+
+Q2. Sort flights to find the most delayed flights. Find the flights that left earliest.
+```{r}
+arrange(flights, desc(arr_delay), dep_delay)
+```
+
+
+Q3. Sort flights to find the fastest flights.
+```{r}
+arrange(flights, arr_delay)
+```
+
+Q4. Which flights travelled the longest? Which travelled the shortest?
+```{r}
+arrange(flights, air_time) # shortest flights
+arrange(flights, desc(air_time)) # longest flights
+```
+
+
+### select()
+
+```{r}
+# Used to select subset of columns/features
+select(flights,year,month,day)
+# Alteranate way to get same subset of data
+select(flights, year:day)
+# All columns but a few (omit a few columns)
+select(flights, -(year:day))
+select(flights, -c(year,month,day))
+select(flights,-year,-month,-day)
+```
+
+### rename()
+
+```{r}
+# Renaming variables using rename()
+rename(flights, tail_number = tailnum)
+```
+
+### everything()
+
+```{r}
+# everything()
+select(flights, air_time, everything()) # moves the air_time column to the beginning
+```
+
+### Exercises
+
+Q1. Brainstorm as many ways as possible to select dep_time, dep_delay, arr_time, and arr_delay from flights
+```{r}
+select(flights, c(dep_time, dep_delay, arr_time, arr_delay))
+```
+
+
+Q2. What happens if you include the name of a variable multiple times in a select() call?
+```{r}
+select(flights, c("arr_time","arr_time")) # no error
+```
+
+
+Q3. What does the one_of() function do? Why might it be helpful in conjunction with this vector?
+```{r}
+vars <- c("year", "month", "day", "dep_delay", "arr_delay")
+select(flights, one_of(vars))
+```
+
+
+Q4. Does the result of running the following code surprise you? How do the select helpers deal with case by default? How can you change that default?
+```{r}
+select(flights, contains("TIME")) # ignore.case can be set to FALSE (default TRUE)
+```
+
+### mutate()
+
+```{r}
+# Using subset of flight data
+flights_sml <- select(flights, 
+  year:day, 
+  ends_with("delay"), 
+  distance, 
+  air_time
+)
+
+# Adding new columns 
+
+mutate(flights_sml,
+  gain = dep_delay - arr_delay,
+  speed = round(distance / air_time * 60,3)
+)
+```
+
+```{r}
+# Use columns just created
+mutate(flights_sml,
+  gain = dep_delay - arr_delay,
+  hours = air_time / 60,
+  gain_per_hour = gain / hours # gain created above
+)
+```
+
+### transmute()
+
+```{r}
+# Keep only newly created columns
+transmute(flights_sml,
+  gain = dep_delay - arr_delay,
+  hours = air_time / 60,
+  gain_per_hour = gain / hours
+)
+```
+
+### Aggregate Functions 
+
+```{r}
+y <- c(1, 2, 2, NA, 3, 4)
+min_rank(y)
+row_number(y)
+dense_rank(y)
+```
+
+### Exercises
+
+```{r}
+transmute(flights, air_time, arr_time - dep_time)
+#transmute(flights, arr_time, sched_arr_time, arr_delay, dep_time, sched_dep_time, dep_delay)
+```
+
+```{r}
+transmute(flights, dep_time, sched_dep_time, dep_delay)
+```
+
+```{r}
+fl_df <- mutate(flights, total_delay = arr_delay + dep_delay)
+transmute(arrange(fl_df, desc(total_delay)), total_delay)
+```
+
+```{r, eval=FALSE}
+1:3 + 1:10 # error
+```
+
+### summarise()
+
+```{r}
+# One row summary
+summarise(flights, delay = mean(dep_delay, na.rm = TRUE))
 ```
 

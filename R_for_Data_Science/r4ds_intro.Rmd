@@ -97,6 +97,7 @@ ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy),
 
 ### Exercises-2
 
+
 Q1. What’s gone wrong with this code? Why are the points not blue? 
 ```{r}
 # color should be outside aes()
@@ -104,10 +105,12 @@ ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
 ```
 
+
 Q2. Which variables in mpg are categorical? Which variables are continuous? (Hint: type ?mpg to read the documentation for the dataset). How can you see this information when you run mpg?
 ```{r}
 summary(mpg)
 ```
+
 
 Q3. Map a continuous variable to color, size, and shape. How do these aesthetics behave differently for categorical vs. continuous variables?
 ```{r}
@@ -140,10 +143,12 @@ ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy,
                                              color = cty, size = cty))
 ```
 
+
 Q. What does the stroke aesthetic do? What shapes does it work with? (Hint: use ?geom_point)
 ```{r}
 ?geom_point # stroke aesthetic
 ```
+
 
 Q. What happens if you map an aesthetic to something other than a variable name, like aes(colour = displ < 5)? Note, you’ll also need to specify x and y. 
 ```{r}
@@ -177,6 +182,7 @@ ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy)) +
 ```
 
 ### Exercises-3
+
 
 Q1. What happens if you facet on a continuous variable?
 ```{r}
@@ -256,11 +262,13 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
 
 ### Exercises-4
 
+
 Q1. What geom would you use to draw a line chart? A boxplot? A histogram? An area chart?
 Ans. geom_boxplot(), geom_histogram()
 ```{r}
 ggplot(data = mpg, mapping = aes(x = drv, y = hwy)) + geom_boxplot()
 ```
+
 
 Q2. Recreate the plots
 ```{r}
@@ -336,6 +344,7 @@ ggplot(data = diamonds) +
 
 ### Exercises-5
 
+
 Q1. What is the default geom associated with stat_summary()? How could you rewrite the previous plot to use that geom function instead of the stat function?
 ```{r}
 ggplot(data = diamonds) + geom_boxplot(mapping = aes(x = cut, y = depth))
@@ -363,6 +372,7 @@ ggplot(data = diamonds) +
 
 ### Exercises-6
 
+
 Q.What is the problem with this plot? How could you improve it?
 ```{r}
 # Original Plot
@@ -378,11 +388,13 @@ ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
 
 The above plot can also be plotted using the geom_jitter function. This jitter avoids overplotting and adds a small amount on random noise to each point.
 
+
 Q. What’s the default position adjustment for geom_boxplot()? Create a visualisation of the mpg dataset that demonstrates it.
 
 ```{r}
 ggplot(data = mpg, mapping = aes(x = drv, y = hwy)) + geom_boxplot()
 ```
+
 
 ```{r, eval=FALSE}
 # Grammar of Graphics Template
