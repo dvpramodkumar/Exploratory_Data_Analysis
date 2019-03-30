@@ -316,3 +316,83 @@ transmute(arrange(fl_df, desc(total_delay)), total_delay)
 summarise(flights, delay = mean(dep_delay, na.rm = TRUE))
 ```
 
+### group_by()
+
+```{r}
+# Grouping and applying summarise()
+by_day <- group_by(flights, year, month, day)
+summarise(by_day, delay = round(mean(dep_delay, na.rm = TRUE),2))
+```
+
+
+```{r}
+by_dest <- group_by(flights, dest)
+
+delay <- summarise(by_dest,
+  count = n(),
+  dist = mean(distance, na.rm = TRUE),
+  delay = mean(arr_delay, na.rm = TRUE)
+)
+
+delay <- filter(delay, count > 20, dest != "HNL")
+```
+
+
+```{r}
+ggplot(data = delay, mapping = aes(x = dist, y = delay)) +
+  geom_point(aes(size = count), alpha = 1/3) +
+  geom_smooth(se = FALSE)
+```
+
+### Multiple Operations using pipes
+
+```{r}
+delays <- flights %>% 
+  group_by(dest) %>% 
+  summarise(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>% 
+  filter(count > 20, dest != "HNL")
+```
+
+```{r}
+# na.rm = TRUE removes missing values
+flights %>% 
+  group_by(year, month, day) %>% 
+  summarise(mean = mean(dep_delay))
+
+flights %>% 
+  group_by(year, month, day) %>% 
+  summarise(mean = mean(dep_delay, na.rm = TRUE))
+```
+
+```{r}
+# remove flights with NA values before exploring dataset
+
+not_cancelled <- flights %>% 
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+
+# Cancelled Flights
+print(nrow(flights) - nrow(not_cancelled))
+```
+
+```{r}
+not_cancelled %>% 
+  group_by(year,month) %>% 
+  summarise(mean_delay = round(mean(dep_delay),2)) %>% arrange(mean_delay)
+```
+
+```{r}
+delays <- not_cancelled %>% 
+  group_by(tailnum) %>% 
+  summarise(
+    delay = mean(arr_delay)
+  )
+
+ggplot(data = delays, mapping = aes(x = delay)) + 
+  geom_freqpoly(binwidth = 10)
+```
+
+
