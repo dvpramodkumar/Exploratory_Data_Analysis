@@ -22,12 +22,130 @@ knitr::opts_chunk$set(fig.width=9, fig.height=5)
 
 ```{r echo=TRUE}
 library(tidyverse)
+library(nycflights13)
 ```
 
-## Questions
+## Sample Visualizations
 
 ```{r}
 ggplot(data = diamonds) +
   geom_bar(mapping = aes(x = cut))
 ```
 
+```{r}
+# Heights of bars using dplyr::count()
+diamonds %>% count(cut)
+```
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = carat), binwidth = 0.5)
+```
+
+```{r}
+# Heights using dplyr and ggplot2
+diamonds %>% count(cut_width(carat,0.5))
+```
+
+```{r}
+# Multiple histograms ovrlapping in a single plot
+ggplot(data = filter(diamonds, carat < 3), mapping = aes(x = carat, colour = cut)) +
+  geom_freqpoly(binwidth = 0.1)
+```
+
+## Sample Questions
+
+1. Which values are the most common? Why?
+
+2. Which values are rare? Why? Does that match your expectations?
+
+3. Can you see any unusual patterns? What might explain them?
+
+
+```{r}
+ggplot(data = faithful, mapping = aes(x = eruptions)) + 
+  geom_histogram(binwidth = 0.25) + ggtitle('Frequency of Length of Eruptions')
+```
+
+
+## Handling Data
+
+1. Typical Values
+2. Unusual Values
+3. Missing Values
+
+### Unusual Values
+
+```{r}
+summary(diamonds)
+```
+
+```{r}
+ggplot(data = diamonds) + geom_histogram(mapping = aes(x = y), binwidth = 0.5)
+```
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = y), binwidth = 0.5) +
+  coord_cartesian(ylim = c(0,100))
+```
+
+```{r}
+# Digging unusual values using dplyr
+unusual <- diamonds %>% 
+  filter(y < 3 | y > 20) %>%
+  select(price, x , y , z) %>%
+  arrange(y)
+
+unusual
+```
+
+### Missing Values
+
+We shall replace unusual values in the data as missing values (NA) instead of dropping them
+
+#### ifelse()
+
+```{r}
+# case_when() can also be used to re-write the below line of code
+diamonds2 <- diamonds %>% 
+  mutate(y = ifelse(y < 3 | y > 20, NA, y))
+```
+
+```{r}
+ggplot(data = diamonds2, mapping = aes(x = x, y = y)) +
+  geom_point(na.rm = TRUE)
+```
+
+```{r}
+# Compare cancelled and non-cancelled flights
+nycflights13::flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>% 
+  ggplot(mapping = aes(sched_dep_time)) + 
+    geom_freqpoly(mapping = aes(colour = cancelled), binwidth = 1/4)
+```
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_boxplot(mapping = aes(x = cut ,y = price))
+```
+
+### reorder()
+
+```{r}
+# Reordering basing on average price from lower to higher
+ggplot(data = diamonds) + 
+  geom_boxplot(mapping = aes(x = reorder(cut, price, FUN = mean), y = price))
+```
+
+```{r}
+# Flipping can be done if variable names are long
+ggplot(data = diamonds) + 
+  geom_boxplot(mapping = aes(x = reorder(cut, price, FUN = mean), y = price)) +
+  coord_flip()
+```
