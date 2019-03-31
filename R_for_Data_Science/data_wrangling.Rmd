@@ -48,3 +48,29 @@ class(mtcars)
 class(df)
 ```
 
+## readr
+
+The read_csv() in readr package in faster than the base read.csv() by over (~10x). Also data.table::fread() can read data in at blazing speeds.
+
+1. read_csv()
+2. read_csv2()
+3. read_tsv()
+4. read_fwf()
+5. read_log()
+6. read_delim()
+
+### Parsing Functions
+
+1. parse_logical()
+2. parse_integer()
+3. parse_date()
+
+## tidyr
+
+1. gather()
+2. spread()
+
+```{r}
+table4a # untidy data
+```
+

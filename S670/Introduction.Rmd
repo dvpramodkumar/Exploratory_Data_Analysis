@@ -4,7 +4,6 @@ author: "Pramod Duvvuri"
 date: "3/11/2019"
 output:
   pdf_document: default
-  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -50,8 +49,11 @@ ggplot(singer, aes(x= height)) + geom_histogram(binwidth = 1)
 
 ```{r}
 # Density Plot
-ggplot(singer, aes(x= height)) + geom_density()
-ggplot(singer, aes(x= height)) + geom_density(adjust = 0.5)
+ggplot(singer, aes(x= height)) + 
+  geom_density()
+
+ggplot(singer, aes(x= height)) + 
+  geom_density(adjust = 0.5)
 ```
 
 ```{r}
@@ -81,8 +83,10 @@ ggplot(singer,aes(sample = height)) + stat_qq(distribution = qunif) +
 ```
 
 ```{r}
+# The plot above looks cramped, so lets try a grid with columns
 # Facet with grid display
-ggplot(singer, aes(sample = height)) + stat_qq(distribution = qunif) + 
+ggplot(singer, aes(sample = height)) + 
+  stat_qq(distribution = qunif) + 
   facet_wrap(~voice.part, ncol = 2)
 ```
 
