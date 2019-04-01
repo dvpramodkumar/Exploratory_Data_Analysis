@@ -1,6 +1,7 @@
 ## Exploratory_Data_Analysis
 
-This repo contains code from different sources. They are:
+This repo contains code from different books/sources. They are:
+
 1. Exploratory Data Analysis (EDA) course at Indiana University (STAT-S 670)
 2. R for Data Science code snippets
 

@@ -73,12 +73,14 @@ ggplot(singer, aes(sample = height)) + stat_qq()
 
 ```{r}
 # QQ-Plot using a Uniform Distribution
-ggplot(singer, aes(sample = height)) + stat_qq(distribution = qunif)
+ggplot(singer, aes(sample = height)) + 
+  stat_qq(distribution = qunif)
 ```
 
 ```{r}
 # Facet
-ggplot(singer,aes(sample = height)) + stat_qq(distribution = qunif) +
+ggplot(singer,aes(sample = height)) + 
+  stat_qq(distribution = qunif) +
   facet_grid(~voice.part)
 ```
 
