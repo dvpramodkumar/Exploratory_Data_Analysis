@@ -90,7 +90,7 @@ ggplot(singer,aes(sample = height)) +
 # The plot above looks cramped, so lets try a grid with columns
 # Facet with grid display
 ggplot(singer, aes(sample = height)) + 
-  stat_qq(distribution = qunif) + 
+  stat_qq(distribution = qunif) +
   facet_wrap(~voice.part, ncol = 2)
 ```
 
@@ -118,5 +118,41 @@ ggplot(data = qq_df, mapping =
 ggplot(data = qq_df, mapping = aes(x = (x + y)/2, y = y - x)) + 
   geom_point() + 
   geom_abline(slope = 0) + ggtitle("Tukey Mean-Difference Plot")
+```
+
+```{r}
+singer_means = aggregate(height ~ voice.part, FUN = mean, data = singer)
+```
+
+```{r}
+ggplot(singer_means, aes(x = voice.part, y = height)) + geom_point() + coord_flip()
+```
+
+```{r}
+# Fitting a linear model
+singer.lm = lm(height ~ voice.part, data = singer)
+```
+
+```{r}
+# Extracting residual values
+singer.res = data.frame(voice.part = singer$voice.part, residual = residuals(singer.lm))
+```
+
+```{r}
+# Observing Residuals using boxplots
+ggplot(singer.res, aes(x = voice.part, y = residual)) + geom_boxplot() + coord_flip()
+```
+
+```{r}
+# Checking normality of residuals
+ggplot(singer.res, aes(sample = residual)) + 
+  stat_qq() + 
+  facet_wrap(~voice.part, ncol = 2)
+```
+
+```{r}
+# QQ Plot for Normality
+ggplot(singer.res, aes(sample = residual)) + 
+  stat_qq()
 ```
 
