@@ -13,7 +13,7 @@ knitr::opts_chunk$set(fig.width=9, fig.height=5)
 
 # Univariate Data
 
-## Learning ggplot2
+## Learning Grammar of Graphics (ggplot2)
 
 ```{r}
 # Load installed packages
@@ -87,8 +87,7 @@ ggplot(singer,aes(sample = height)) +
 ```
 
 ```{r}
-# The plot above looks cramped, so lets try a grid with columns
-# Facet with grid display
+# The plot above looks cramped, so let us try a grid with columns
 ggplot(singer, aes(sample = height)) + 
   stat_qq(distribution = qunif) +
   facet_wrap(~voice.part, ncol = 2)
@@ -121,7 +120,7 @@ ggplot(data = qq_df, mapping = aes(x = (x + y)/2, y = y - x)) +
 ```
 
 ```{r}
-singer_means = aggregate(height ~ voice.part, FUN = mean, data = singer)
+singer_means <- aggregate(height ~ voice.part, FUN = mean, data = singer)
 ```
 
 ```{r}
@@ -130,12 +129,12 @@ ggplot(singer_means, aes(x = voice.part, y = height)) + geom_point() + coord_fli
 
 ```{r}
 # Fitting a linear model
-singer.lm = lm(height ~ voice.part, data = singer)
+singer.lm <- lm(height ~ voice.part, data = singer)
 ```
 
 ```{r}
 # Extracting residual values
-singer.res = data.frame(voice.part = singer$voice.part, residual = residuals(singer.lm))
+singer.res <- data.frame(voice.part = singer$voice.part, residual = residuals(singer.lm))
 ```
 
 ```{r}
@@ -154,5 +153,95 @@ ggplot(singer.res, aes(sample = residual)) +
 # QQ Plot for Normality
 ggplot(singer.res, aes(sample = residual)) + 
   stat_qq()
+```
+
+```{r}
+# QQ Plot for Normality and adding slope and intercept
+ggplot(singer.res, aes(sample = residual)) + 
+  stat_qq() + geom_abline(intercept = 0,
+slope = summary(singer.lm)$sigma)
+```
+
+```{r}
+# Prepare Data
+singer.fitted <- sort(fitted.values(singer.lm)) - mean(fitted.values(singer.lm))
+singer.residuals <- sort(residuals(singer.lm))
+n = length(singer.residuals)
+f.value = (0.5:(n - 0.5))/n
+singer.fit = data.frame(f.value, Fitted = singer.fitted, Residuals = singer.residuals)
+```
+
+```{r}
+library(tidyr)
+singer.fit.long = singer.fit %>% gather(type, value, Fitted:Residuals)
+```
+
+```{r}
+# Residual-Fit spread plot
+ggplot(singer.fit.long, aes(x = f.value, y = value)) + 
+  geom_point() + 
+  facet_wrap(~type)
+```
+
+```{r}
+# Using stat_qq() to calculate f-values
+ggplot(singer.fit.long, aes(sample = value)) + 
+  stat_qq(distribution = "qunif") + 
+  facet_grid(~type)
+```
+
+```{r}
+# Using R-Squared
+round(var(singer.fitted)/var(singer$height),3)
+```
+
+```{r}
+url <- "https://github.com/hadley/tidy-data/raw/master/data/billboard.csv"
+billboard.raw <- read.csv(url, stringsAsFactors = FALSE)
+```
+
+```{r}
+# Creating a Tibble
+library(dplyr)
+billboard <- tbl_df(billboard.raw)
+billboard
+```
+
+```{r}
+# Calculating time-length of each song
+billboard.time <- strsplit(billboard$time, ":")
+billboard.time <- matrix(unlist(billboard.time), byrow = T, ncol = 2)
+billboard.mins <- as.numeric(billboard.time[, 1])
+billboard.secs <- as.numeric(billboard.time[, 2])
+billboard.time <- billboard.mins * 60 + billboard.secs
+billboard$time <- billboard.time/60
+```
+
+```{r}
+billboard.long <- billboard %>% 
+  gather(week, rank, x1st.week:x76th.week, na.rm = TRUE)
+billboard.long
+```
+
+```{r}
+ggplot(billboard, aes(x = time)) + 
+  geom_histogram(breaks = seq(2.5, 8, 0.25))
+```
+
+```{r}
+# Finding mean song length
+time.means = aggregate(time ~ rank, FUN = mean, data = billboard.long)
+```
+
+```{r}
+# Plotting mean song lenghts
+ggplot(time.means, aes(x = rank, y = time)) + geom_line()
+```
+
+### Transformations
+
+```{r}
+# Load data from workspace
+load("./data/lattice.RData")
 ```
 
