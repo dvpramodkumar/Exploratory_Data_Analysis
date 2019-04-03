@@ -1,0 +1,14 @@
+Cars Data
+========================================================
+Author: Pramod Duvvuri
+
+```{r}
+summary(mtcars)
+nrow(mtcars)
+```
+
+```{r}
+# Basic Plot using Base R plot()
+plot(mtcars$disp, mtcars$hp)
+```
+
