@@ -240,8 +240,157 @@ ggplot(time.means, aes(x = rank, y = time)) + geom_line()
 
 ### Transformations
 
+#### Log Transformation
+
+
 ```{r}
 # Load data from workspace
 load("./data/lattice.RData")
+```
+
+```{r}
+summary(fusion.time)
+```
+
+```{r}
+# Plot without data transformation
+time = fusion.time$time
+nv.vv = fusion.time$nv.vv
+NV.times = sort(time[nv.vv == "NV"])
+VV.times = sort(time[nv.vv == "VV"])
+NV.VV.qq = as.data.frame(qqplot(NV.times, VV.times, plot.it = FALSE))
+
+ggplot(NV.VV.qq, aes(x, y)) + geom_point() + geom_abline()
+```
+
+```{r}
+# Using a log transformation
+NV.times.log = sort(log2(time[nv.vv == "NV"]))
+VV.times.log = sort(log2(time[nv.vv == "VV"]))
+NV.VV.qq.log = as.data.frame(qqplot(NV.times.log, VV.times.log, plot.it = FALSE))
+
+ggplot(NV.VV.qq.log, aes(x, y)) + geom_point() + geom_abline()
+```
+
+```{r}
+# Tukey Mean-Difference Plot
+ggplot(NV.VV.qq.log, aes((x + y)/2, y - x)) + geom_point()
+```
+
+#### Power Transformation
+
+
+```{r}
+n.VV = length(VV.times)
+power = rep(seq(-1, 1, 0.25), each = n.VV)
+VV.time = c(VV.times^-1, VV.times^-0.75, 
+            VV.times^-0.5, VV.times^-0.25, 
+            log(VV.times), VV.times^0.25, 
+            VV.times^0.5, VV.times^0.75, VV.times)
+
+ggplot(data.frame(power, VV.time), aes(sample = VV.time)) + 
+  stat_qq() + facet_wrap(~power, scales = "free")
+```
+
+```{r}
+summary(food.web)
+```
+
+```{r}
+ggplot(food.web, aes(sample = mean.length)) + 
+  stat_qq(distribution = qunif) + facet_grid(~dimension)
+```
+
+```{r}
+web.length = food.web$mean.length
+dimension = food.web$dimension
+n = nrow(food.web)
+median.3 = median(web.length[dimension == "Three"])
+median.2 = median(web.length[dimension == "Two"])
+median.mixed = median(web.length[dimension == "Mixed"])
+group.median = rep(NA, n)
+group.median[dimension == "Three"] = median.3
+group.median[dimension == "Two"] = median.2
+group.median[dimension == "Mixed"] = median.mixed
+jittered.medians = group.median + runif(n, -0.1, 0.1)
+root.abs.res = sqrt(abs(web.length - group.median))
+food.web.sl = data.frame(jittered.medians, root.abs.res, dimension)
+ggplot(food.web.sl, aes(jittered.medians, root.abs.res, col = dimension)) +
+geom_point()
+```
+
+```{r}
+# Using log transformation
+
+log.web.length = log2(food.web$mean.length)
+median.3.log = median(log.web.length[dimension == "Three"])
+median.2.log = median(log.web.length[dimension == "Two"])
+median.mixed.log = median(log.web.length[dimension == "Mixed"])
+group.median.log = rep(NA, n)
+group.median.log[dimension == "Three"] = median.3.log
+group.median.log[dimension == "Two"] = median.2.log
+group.median.log[dimension == "Mixed"] = median.mixed.log
+jittered.medians.log = group.median.log + runif(n, -0.05, 0.05)
+root.abs.res.log = sqrt(abs(log.web.length - group.median.log))
+food.web.log.sl = data.frame(jittered.medians.log, root.abs.res.log, dimension)
+ggplot(food.web.log.sl, aes(jittered.medians.log, root.abs.res.log, col = dimension)) +
+geom_point()
+```
+
+```{r}
+ggplot(food.web, aes(sample = log(mean.length))) + 
+  stat_qq() +
+  facet_wrap(~dimension)
+```
+
+```{r}
+# Using Inverse Transformation
+inv.web.length = 1/food.web$mean.length
+median.3.inv = median(inv.web.length[dimension == "Three"])
+median.2.inv = median(inv.web.length[dimension == "Two"])
+median.mixed.inv = median(inv.web.length[dimension == "Mixed"])
+group.median.inv = rep(NA, n)
+group.median.inv[dimension == "Three"] = median.3.inv
+group.median.inv[dimension == "Two"] = median.2.inv
+group.median.inv[dimension == "Mixed"] = median.mixed.inv
+jittered.medians.inv = group.median.inv + runif(n, -0.01, 0.01)
+root.abs.res.inv = sqrt(abs(inv.web.length - group.median.inv))
+food.web.inv.sl = data.frame(jittered.medians.inv, root.abs.res.inv, dimension)
+ggplot(food.web.inv.sl, aes(jittered.medians.inv, root.abs.res.inv, col = dimension)) +
+geom_point()
+```
+
+```{r}
+# Calculate Mean
+aggregate(root.abs.res.inv ~ dimension, FUN = mean)
+```
+
+```{r}
+# Normality Check
+ggplot(food.web, aes(sample = 1/mean.length)) + stat_qq() + facet_wrap(~dimension)
+```
+
+```{r}
+food.web.lm = lm(inv.web.length ~ dimension)
+food.web.res = residuals(food.web.lm)
+res.qq.3 = qqplot(food.web.res, food.web.res[dimension == "Three"], plot.it = FALSE)
+res.qq.2 = qqplot(food.web.res, food.web.res[dimension == "Two"], plot.it = FALSE)
+res.qq.mixed = qqplot(food.web.res, food.web.res[dimension == "Mixed"], plot.it = FALSE)
+food.web.res.qq = data.frame(pooled = c(res.qq.3$x, res.qq.2$x, res.qq.mixed$x),
+residual = c(res.qq.3$y, res.qq.2$y, res.qq.mixed$y), dimension = c(rep("Three",
+length(res.qq.3$x)), rep("Two", length(res.qq.2$x)), rep("Mixed", length(res.qq.mixed$x))))
+ggplot(food.web.res.qq, aes(pooled, residual)) + geom_point() + geom_abline() +
+facet_wrap(~dimension)
+```
+
+```{r}
+# Residual Fitted Spread Plot
+food.web.fitted = sort(fitted.values(food.web.lm)) - mean(fitted.values(food.web.lm))
+n = length(inv.web.length)
+f.value = (0.5:(n - 0.5))/n
+food.web.fit = data.frame(f.value, Fitted = food.web.fitted, Residuals = sort(food.web.res))
+library(tidyr)
+food.web.fit.long = food.web.fit %>% gather(type, value, Fitted:Residuals)
+ggplot(food.web.fit.long, aes(x = f.value, y = value)) + geom_point() + facet_wrap(~type)
 ```
 
