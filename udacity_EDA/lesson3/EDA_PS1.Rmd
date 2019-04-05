@@ -1,0 +1,127 @@
+---
+title: "Data Analysis with R"
+subtitle: "Problem Set 1"
+author: "Pramod Duvvuri"
+date: "4/5/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=9, fig.height=5)
+```
+
+### Diamonds Data
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+nrow(diamonds)
+summary(diamonds)
+?diamonds
+```
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = price)) + 
+  geom_histogram()
+```
+
+```{r}
+summary(diamonds$price)
+mean(diamonds$price)
+```
+
+```{r}
+nrow(subset(diamonds, diamonds$price < 500))
+nrow(subset(diamonds, diamonds$price < 250))
+nrow(subset(diamonds, diamonds$price >= 15000))
+```
+
+```{r}
+# Exploring the Peak of the Histogram
+ggplot(data = diamonds, mapping = aes(x = price)) + 
+  geom_histogram(na.rm = TRUE, bins = 100) + 
+  scale_x_continuous(limits = c(300,1500), 
+                     breaks = seq(300,1500,50))
+
+# Save the plot
+ggsave('price_histogram.jpg')
+```
+
+```{r}
+# Histogram by Cut
+ggplot(data = diamonds, mapping = aes(x = price)) + 
+  geom_histogram(na.rm = TRUE, bins = 100) +
+  facet_wrap(~cut)
+```
+
+```{r}
+# Highest Price By Cut
+by(diamonds$price, diamonds$cut, FUN = max)
+# Lowest Price By Cut
+by(diamonds$price, diamonds$cut, FUN = min)
+# Median Lowest Price By Cut
+by(diamonds$price, diamonds$cut, FUN = summary)
+```
+
+```{r}
+# Fixed Scales
+qplot(x = price, data = diamonds) + 
+  facet_wrap(~cut)
+```
+
+```{r}
+# Free Y-Axis Scale
+qplot(x = price, data = diamonds) + 
+  facet_wrap(~cut, scales = "free_y")
+```
+
+```{r}
+# Histogram for Price per Carat (Log Transformed X-Axis)
+ggplot(data = diamonds, 
+       mapping = aes(x = price/carat)) + 
+  geom_histogram(bins = 100) + 
+  scale_x_log10()
+```
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = "Price", y = price)) + 
+  geom_boxplot(na.rm = TRUE) + 
+  facet_wrap(~cut, scales = "free_y") + 
+  scale_y_continuous(limits = c(0,10000)) + 
+  xlab('Cut of Diamond')
+```
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = price)) + 
+  geom_freqpoly(mapping = aes(color = color), na.rm = TRUE)
+```
+
+```{r}
+summary(subset(diamonds, diamonds$color == 'D')$price)
+summary(subset(diamonds, diamonds$color == 'J')$price)
+IQR(subset(diamonds, diamonds$color == 'D')$price)
+IQR(subset(diamonds, diamonds$color == 'J')$price)
+```
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = "Color", y = price/carat)) + 
+  geom_boxplot(na.rm = TRUE) + 
+  facet_wrap(~color, scales = "free_y") + 
+  scale_y_continuous(limits = c(0,10000)) + 
+  ylab('Price/Carat of Diamond') + 
+  xlab('Color')
+```
+
+```{r}
+table(diamonds$carat)
+```
+
+### Gapminder Data
+
+```{r}
+library(gapminder)
+```
+
