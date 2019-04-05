@@ -125,3 +125,18 @@ table(diamonds$carat)
 library(gapminder)
 ```
 
+```{r}
+summary(gapminder)
+```
+
+```{r}
+ggplot(data = gapminder, mapping = aes(x = lifeExp)) + 
+  geom_freqpoly(mapping = aes(color = continent))
+```
+
+```{r}
+ggplot(data = gapminder, mapping = aes(x = gdpPercap)) + 
+  geom_freqpoly(mapping = aes(color = continent)) + 
+  scale_x_log10()
+```
+
