@@ -1,5 +1,6 @@
 ---
-title: "Introduction to EDA"
+title: "Exploratory Data Analysis"
+subtitle: "Introduction to EDA"
 author: "Pramod Duvvuri"
 date: "3/11/2019"
 output:

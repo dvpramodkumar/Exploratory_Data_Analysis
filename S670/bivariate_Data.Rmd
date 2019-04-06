@@ -1,0 +1,110 @@
+---
+title: "Exploratory Data Analysis"
+subtitle: "Bivariate Data"
+author: "Pramod Duvvuri"
+date: "4/5/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=9, fig.height=5)
+```
+
+```{r}
+library(ggplot2)
+load('./data/lattice.RData')
+```
+
+```{r}
+summary(ganglion)
+```
+
+```{r}
+ganglion.gg = ggplot(ganglion, aes(x = area, y = cp.ratio)) + 
+  geom_point()
+```
+
+```{r}
+# Adding a Linear Curve
+ganglion.gg + geom_smooth(method = 'lm', se = FALSE)
+```
+
+```{r}
+# Adding a Loess Curve
+ganglion.gg + geom_smooth(method = 'loess', se = FALSE)
+```
+
+```{r}
+ganglion.lm = lm(cp.ratio ~ area, data = ganglion)
+# install.packages(broom)
+library(broom)
+gang.lm.df = augment(ganglion.lm)
+summary(gang.lm.df)
+```
+
+```{r}
+# Does a linear model fit well for the data
+ggplot(gang.lm.df, aes(x = area, y = .resid)) + 
+  geom_point() + 
+  geom_smooth(method = 'loess') +
+  geom_abline(slope = 0, intercept = 0)
+```
+
+```{r}
+# Does a quadratic model fit well for the data
+ganglion.lm2 = lm(cp.ratio ~ area + I(area^2), data = ganglion)
+gang.lm2.df = augment(ganglion.lm2)
+summary(gang.lm2.df)
+```
+
+
+```{r}
+ggplot(gang.lm2.df, aes(x = area, y = .resid)) + 
+  geom_point() + 
+  geom_smooth(method = 'loess') +
+  geom_abline(slope = 0, intercept = 0)
+```
+
+```{r}
+# Checking fit using a spread-location plot
+ggplot(gang.lm2.df, aes(x = .fitted, y = sqrt(abs(.resid)))) + 
+  geom_point() + 
+  geom_smooth(method = 'loess')
+```
+
+```{r}
+ggplot(ganglion, aes(x = area, y = log2(cp.ratio))) + 
+  geom_point() + geom_smooth()
+```
+
+```{r}
+ggplot(ganglion, aes(x = area, y = log2(cp.ratio))) + 
+  geom_point() + geom_smooth(method = 'lm')
+```
+
+```{r}
+ganglion.log.lm = lm(log2(cp.ratio) ~ area, data = ganglion)
+gang.log.lm.df = augment(ganglion.log.lm)
+ggplot(gang.log.lm.df, aes(x = area, y = .resid)) + 
+  geom_point() + geom_smooth() +
+  geom_abline(slope = 0, intercept = 0)
+```
+
+```{r}
+# Better S-L Plot Using Transformation
+ggplot(gang.log.lm.df, aes(x = .fitted, y = sqrt(abs(.resid)))) + 
+  geom_point() + geom_smooth()
+```
+
+```{r}
+# Calculate R-Squared
+round(var(gang.log.lm.df$.fitted)/var(log2(ganglion$cp.ratio)),3)
+```
+
+```{r}
+# Checking for Normality in the Residuals
+ggplot(gang.log.lm.df, aes(sample = .resid)) + 
+  stat_qq()
+```
+
