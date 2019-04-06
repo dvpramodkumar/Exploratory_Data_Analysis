@@ -4,109 +4,148 @@ Lesson 4
 ***
 
 ### Scatterplots and Perceived Audience Size
-Notes:
-
-***
 
 ### Scatterplots
-Notes:
 
 ```{r Scatterplots}
+library('ggplot2')
+pf <- read.csv('./pseudo_facebook.tsv', sep = '\t')
 
+# Scatterplot
+qplot(data = pf, x = age, y = friend_count)
 ```
 
 ***
 
 #### What are some things that you notice right away?
-Response:
+Response: Younger people have more friends than the others
 
 ***
 
 ### ggplot Syntax
-Notes:
 
 ```{r ggplot Syntax}
-
+ggplot(data = pf, aes(x = age, y = friend_count)) +
+  geom_point(na.rm = TRUE) + 
+  scale_x_continuous(breaks = seq(13,90,5), limits = c(13,90))
 ```
 
 ***
 
 ### Overplotting
-Notes:
+Notes: Bottom part of the plot has too many points which makes it harder to understand
 
 ```{r Overplotting}
-
+# Adding Transparency
+# 20 points makes one black point
+ggplot(data = pf, aes(x = age, y = friend_count)) +
+  #geom_point(alpha = 1/20, na.rm = TRUE) +
+  geom_jitter(alpha = 1/20, na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(13,90,5), limits = c(13,90))
 ```
 
 #### What do you notice in the plot?
-Response:
-
+Response: Most people have around 1000-2000 friends
 ***
 
 ### Coord_trans()
 Notes:
 
 ```{r Coord_trans()}
-
+ggplot(data = pf, aes(x = age, y = friend_count + 1)) +
+  geom_point(alpha = 1/20, na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(13,90,5), limits = c(13,90)) +
+  coord_trans(y = 'sqrt') + 
+  ylab('Friend Count')
 ```
-
-#### Look up the documentation for coord_trans() and add a layer to the plot that transforms friend_count using the square root function. Create your plot!
-
-```{r}
-
-```
-
-#### What do you notice?
 
 ***
 
 ### Alpha and Jitter
 Notes:
 
-```{r Alpha and Jitter}
 
+```{r}
+ggplot(data = pf, aes(x = age, y = pf$friendships_initiated)) +
+  geom_jitter(alpha = 1/10, na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(13,90,10), limits = c(13,90)) +
+  scale_y_continuous(limits = c(0,2000), breaks = seq(0,2000,500)) +
+  ylab('Friendships Initiated')
+
+# Alternate Syntax
+ggplot(data = pf, aes(x = age, y = pf$friendships_initiated)) +
+  geom_point(alpha = 1/10, position = 'jitter', na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(13,90,10), limits = c(13,90)) +
+  scale_y_continuous(limits = c(0,2000), breaks = seq(0,2000,500)) +
+  ylab('Friendships Initiated')
 ```
 
 ***
 
 ### Overplotting and Domain Knowledge
-Notes:
-
+Notes: Used Percentage for Axes to study the data
 ***
 
 ### Conditional Means
-Notes:
 
 ```{r Conditional Means}
+library(dplyr)
+# age_by_group <- group_by(pf, age)
+# pf.fc_by_age <- summarise(
+#   age_by_group,
+#   friend_count_mean = mean(friend_count),
+#   friend_count_median = median(friend_count),
+#   n = n()
+# )
+# 
+# pf.fc_by_age <-  arrange(pf.fc_by_age)
 
+# Using pipes in R
+pf.fc_by_age <- pf %>% 
+                group_by(age) %>% 
+                summarise(
+                friend_count_mean = mean(friend_count),
+                friend_count_median = median(friend_count),
+                n = n()) %>%  
+                arrange()
+
+head(pf.fc_by_age)
 ```
 
-Create your plot!
 
 ```{r Conditional Means Plot}
+ggplot(data = pf.fc_by_age, 
+       mapping = aes(x = age, friend_count_mean)) +
+  geom_point(na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(13,90,10), limits = c(13,90)) +
+  scale_y_continuous(breaks = seq(0,450,50), limits = c(0,450))
 
+# Using geom_line() to see a trend
+
+ggplot(data = pf.fc_by_age, 
+       mapping = aes(x = age, friend_count_mean)) +
+  geom_line(na.rm = TRUE) +
+  scale_x_continuous(breaks = seq(13,90,10), limits = c(13,90)) +
+  scale_y_continuous(breaks = seq(0,450,50), limits = c(0,450))
 ```
 
 ***
 
 ### Overlaying Summaries with Raw Data
-Notes:
 
-```{r Overlaying Summaries with Raw Data}
-
+```{r Overlaying Summaries with Raw Data, warning=FALSE}
+ggplot(data = pf, aes(x = age, y = friend_count + 1)) +
+  geom_point(alpha = 1/20, color = 'orange') +
+  scale_x_continuous(breaks = seq(13,90,5), limits = c(13,90)) +
+  coord_trans(y = 'sqrt') + 
+  geom_line(stat = 'summary', fun.y = mean) +
+  geom_line(stat = 'summary', fun.y = median) +
+  geom_line(stat = 'summary', fun.y = quantile,
+            fun.args = list(probs = .9), color = 'red', linetype = 2) +
+  geom_line(stat = 'summary', fun.y = quantile,
+            fun.args = list(probs = .1), color = 'red', linetype = 2) +
+  ylab('Friend Count')
 ```
-
-#### What are some of your observations of the plot?
-Response:
-
-***
-
-### Moira: Histogram Summary and Scatterplot
-See the Instructor Notes of this video to download Moira's paper on perceived audience size and to see the final plot.
-
-Notes:
-
-***
 
 ### Correlation
 Notes:
@@ -126,21 +165,24 @@ Response:
 Notes:
 
 ```{r Correlation on Subsets}
-with(                 , cor.test(age, friend_count))
+# Checking correlation
+#cor.test(pf$age, pf$friend_count)
+with(pf, cor.test(age, friend_count))
 ```
 
 ***
 
 ### Correlation Methods
-Notes:
+Notes: Use Pearson by default
 
 ***
 
 ## Create Scatterplots
-Notes:
 
 ```{r}
-
+ggplot(data = pf, mapping = 
+         aes(x = likes_received, y = www_likes_received)) +
+  geom_point()
 ```
 
 ***
@@ -149,13 +191,18 @@ Notes:
 Notes:
 
 ```{r Strong Correlations}
-
+ggplot(data = pf, mapping = 
+         aes(x = likes_received, y = www_likes_received)) +
+  geom_point(alpha = 1/20, na.rm = TRUE) +
+  xlim(0, quantile(pf$likes_received, 0.95)) +
+  ylim(0, quantile(pf$www_likes_received, 0.95)) +
+  geom_smooth(method = 'lm', color = 'red')
 ```
 
 What's the correlation betwen the two variables? Include the top 5% of values for the variable in the calculation and round to 3 decimal places.
 
 ```{r Correlation Calcuation}
-
+cor.test(pf$likes_received, pf$www_likes_received)
 ```
 
 Response:
@@ -171,26 +218,29 @@ Notes:
 Notes:
 
 ```{r More Caution With Correlation}
-install.packages('alr3')
+#install.packages('alr3')
 library(alr3)
+data("Mitchell")
+summary(Mitchell)
 ```
 
 Create your plot!
 
 ```{r Temp vs Month}
-
+ggplot(data = Mitchell, mapping = aes(x = Month, y = Temp)) +
+  geom_point()
 ```
 
 ***
 
 ### Noisy Scatterplots
-a. Take a guess for the correlation coefficient for the scatterplot.
+a. Take a guess for the correlation coefficient for the scatterplot. 0.01
 
 b. What is the actual correlation of the two variables?
 (Round to the thousandths place)
 
 ```{r Noisy Scatterplots}
-
+cor.test(Mitchell$Month, Mitchell$Temp)
 ```
 
 ***
@@ -199,7 +249,10 @@ b. What is the actual correlation of the two variables?
 Notes:
 
 ```{r Making Sense of Data}
-
+ggplot(data = Mitchell, mapping = aes(x = Month, y = Temp)) +
+  geom_point(color = 'red') + 
+  scale_x_continuous(breaks = seq(0,203,12), 
+                     limits = c(0,205))
 ```
 
 ***
