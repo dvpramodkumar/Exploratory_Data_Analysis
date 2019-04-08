@@ -11,26 +11,26 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width=9, fig.height=5)
 ```
 
-```{r}
+```{r Load Data}
 library(ggplot2)
 load('./data/lattice.RData')
 ```
 
-```{r}
+```{r Data Summary}
 summary(ganglion)
 ```
 
-```{r}
+```{r Scatterplot-1}
 ganglion.gg = ggplot(ganglion, aes(x = area, y = cp.ratio)) + 
   geom_point()
 ```
 
-```{r}
+```{r Linear Model fitting}
 # Adding a Linear Curve
 ganglion.gg + geom_smooth(method = 'lm', se = FALSE)
 ```
 
-```{r}
+```{r Loess Model}
 # Adding a Loess Curve
 ganglion.gg + geom_smooth(method = 'loess', se = FALSE)
 ```
@@ -106,5 +106,60 @@ round(var(gang.log.lm.df$.fitted)/var(log2(ganglion$cp.ratio)),3)
 # Checking for Normality in the Residuals
 ggplot(gang.log.lm.df, aes(sample = .resid)) + 
   stat_qq()
+```
+
+### Robust Fitting
+
+```{r Carbon Data}
+summary(dating)
+ggplot(dating, aes(x = carbon, y = thorium - carbon)) + 
+  geom_point()
+```
+
+```{r Linear Model}
+ggplot(dating, aes(x = carbon, y = thorium - carbon)) + 
+  geom_point() + 
+  scale_x_continuous(limits = c(0,30),breaks = seq(0,30,3)) +
+  geom_smooth(method = "lm")
+```
+
+```{r}
+dating.lm = lm(thorium - carbon ~ carbon, data = dating)
+library(broom)
+dating.lm.df = augment(dating.lm)
+ggplot(dating.lm.df, aes(x = carbon, y = .resid)) + 
+  geom_point() + 
+  geom_abline(slope = 0)
+```
+
+```{r}
+ggplot(dating, aes(x = carbon, y = thorium - carbon)) + 
+  geom_point() + 
+  scale_x_continuous(limits = c(6,28),breaks = seq(6,28,2)) +
+  geom_smooth(method = 'loess')
+```
+
+```{r}
+# Using rlm for robust fitting in this scenario
+library(MASS)
+ggplot(dating, aes(x = carbon, y = thorium - carbon)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  geom_smooth(method = "rlm", se = FALSE, col = "orange")
+```
+
+```{r}
+gg = ggplot(dating, aes(x = carbon, y = thorium - carbon)) + geom_point() +
+geom_smooth(method = "lm", se = FALSE)
+
+gg + geom_smooth(method = "rlm", se = FALSE, col = "orange", 
+                 method.args = list(psi = psi.bisquare))
+```
+
+```{r}
+age.diff = dating$thorium - dating$carbon
+carbon = dating$carbon
+dating.rlm = rlm(age.diff ~ carbon, psi = psi.bisquare)
+tidy(dating.rlm)
 ```
 
