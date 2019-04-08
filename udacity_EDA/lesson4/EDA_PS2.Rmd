@@ -1,0 +1,141 @@
+---
+title: "Data Analysis with R"
+subtitle: "Problem Set 2"
+description: "Bivariate Data"
+author: "Pramod Duvvuri"
+date: "4/8/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=9, fig.height=5)
+```
+
+### Diamonds Data
+
+```{r}
+suppressMessages(library(tidyverse))
+data(diamonds)
+```
+
+```{r}
+nrow(diamonds)
+summary(diamonds)
+?diamonds
+```
+
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = price, y = x)) +
+  geom_point()
+```
+
+
+```{r}
+# Correlation between price and x
+cor.test(diamonds$price, diamonds$x)
+
+# Correlation between price and y
+cor.test(diamonds$price, diamonds$y)
+
+# Correlation between price and z
+cor.test(diamonds$price, diamonds$z)
+```
+
+
+```{r}
+# Price vs Depth
+ggplot(data = diamonds, mapping = aes(x = price, y = depth)) +
+  geom_point()
+```
+
+
+```{r}
+ggplot(data = diamonds, aes(x = depth, y = price)) + 
+  geom_point(alpha = 1/100, na.rm = TRUE) + 
+  scale_x_continuous(limits = c(56,70), breaks = seq(50,70,2))
+```
+
+```{r}
+cor.test(diamonds$depth, diamonds$price)
+```
+
+```{r}
+# Omitting top 1% in Price
+quantile(diamonds$price, probs = 0.99)
+
+ggplot(data = subset(diamonds, diamonds$price < 17378.22), 
+             mapping = aes(x = price, y = carat)) + geom_point()
+```
+
+```{r}
+# Price vs Volume
+diamonds$volume = diamonds$x * diamonds$y * diamonds$z
+ggplot(data = diamonds, 
+             mapping = aes(x = price, y = volume)) + 
+  geom_point()
+```
+
+```{r}
+table(diamonds$volume == 0)
+```
+
+```{r}
+diamonds_subset <- subset(diamonds, diamonds$volume > 0 & diamonds$volume <= 800)
+cor(diamonds_subset$price, diamonds_subset$volume)
+```
+
+```{r}
+ggplot(data = diamonds_subset, mapping = aes(x = price, y = volume)) +
+  geom_point(alpha = 1/20) + 
+  geom_smooth(method = 'lm')
+```
+
+```{r}
+diamondsByClarity <- diamonds %>% 
+  group_by(clarity) %>% 
+  summarise(mean_price = mean(price),
+             median_price = median(price),
+             min_price = min(price),
+             max_price = max(price),
+             n = n()) %>% 
+   arrange(n)
+```
+
+```{r}
+diamonds_by_clarity <- group_by(diamonds, clarity)
+diamonds_mp_by_clarity <- summarise(diamonds_by_clarity, mean_price = mean(price))
+
+diamonds_by_color <- group_by(diamonds, color)
+diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
+```
+
+```{r}
+p1 <- ggplot(data = arrange(diamonds_mp_by_clarity, mean_price)) + 
+  geom_col(mapping = aes(x = clarity, y = mean_price, fill = clarity))
+
+p2 <- ggplot(data = arrange(diamonds_mp_by_color, mean_price)) + 
+  geom_col(mapping = aes(x = color, y = mean_price, fill = color))
+
+gridExtra::grid.arrange(p1,p2, ncol = 1)
+```
+
+```{r}
+#install.packages('gapminder')
+library(gapminder)
+data("gapminder")
+summary(gapminder)
+```
+
+```{r}
+ggplot(data = gapminder, mapping = aes(x = lifeExp, y = pop)) +
+  geom_point() + 
+  scale_y_log10()
+```
+
+```{r}
+cor.test(gapminder$pop, gapminder$lifeExp)
+```
+
+
