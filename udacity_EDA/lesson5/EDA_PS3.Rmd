@@ -51,5 +51,45 @@ ggplot(data = subset(diamonds, price < 17378.22) ,
 
 ```{r}
 pf <- read.delim('pseudo_facebook.tsv')
+pf <- na.omit(pf)
+names(pf)
 ```
 
+```{r}
+pf$prop_initiated <-  pf$friendships_initiated / pf$friend_count
+
+ggplot(data = pf, mapping = aes(x = prop_initiated)) +
+  geom_histogram(na.rm = TRUE, bins = 100, fill = 'orange', color = 'black') +
+  scale_x_continuous(breaks = seq(0,1,0.1))
+```
+
+```{r Year Joined}
+pf$year_joined <- floor(2014 - pf$tenure/365)
+sort(table(pf$year_joined))
+?cut
+
+pf$year_joined.bucket <-  cut(pf$year_joined,
+                              c(2004, 2009, 2011, 2012, 2014))
+
+table(pf$year_joined.bucket)
+```
+
+```{r Median Friends}
+ggplot(data = na.omit(pf), mapping = aes(x = tenure, y = prop_initiated)) + 
+  geom_line(stat = 'summary', fun.y = median,
+            mapping = aes(color = year_joined.bucket), na.rm = TRUE)
+```
+
+```{r}
+ggplot(data = na.omit(pf), mapping = aes(x = tenure, y = prop_initiated)) + 
+  geom_line(stat = 'summary', fun.y = median,
+            mapping = aes(color = year_joined.bucket), na.rm = TRUE) +
+  geom_smooth()
+```
+
+```{r Diamonds}
+ggplot(data = diamonds, mapping = aes(x = cut, y = price/carat)) + 
+  geom_jitter(mapping = aes(color = color)) +
+  scale_color_brewer(type = 'div') +
+  facet_wrap(~clarity)
+```
