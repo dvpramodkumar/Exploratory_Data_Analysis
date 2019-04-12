@@ -1,0 +1,55 @@
+---
+title: "Data Analysis with R"
+subtitle: "Problem Set 3"
+description: "Multivariate Data"
+author: "Pramod Duvvuri"
+date: "4/11/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=9, fig.height=5)
+```
+
+```{r message=FALSE}
+library(tidyverse)
+data("diamonds")
+head(diamonds)
+```
+
+```{r Histogram}
+ggplot(data = diamonds, mapping = aes(x = log(price), fill = cut)) + 
+  geom_histogram(bins = 50) +  facet_wrap(~color,nrow = 3) + 
+  scale_fill_brewer(type = 'qual') + xlab('price')
+```
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = table, y = price)) +
+  scale_fill_brewer(type = 'qual') +
+  geom_point(mapping = aes(color = cut))
+```
+
+```{r}
+range(filter(diamonds, cut == 'Ideal')$table)
+range(filter(diamonds, cut == 'Premium')$table)
+```
+
+```{r message=FALSE, warning=FALSE}
+# Adding volume column
+diamonds <- mutate(diamonds, volume = round(x * y * z,2))
+
+#summary(diamonds$price)
+
+ggplot(data = subset(diamonds, price < 17378.22) , 
+       mapping = aes(y = price, x = volume)) +
+  geom_point(mapping = aes(color = clarity)) +
+  scale_color_brewer(type = 'div') + scale_y_log10() + 
+  scale_x_continuous(breaks = seq(0,1000,200), limits = c(0,1000)) +
+  ylab('Price')
+```
+
+```{r}
+pf <- read.delim('pseudo_facebook.tsv')
+```
+
