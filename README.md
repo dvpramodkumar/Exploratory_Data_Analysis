@@ -2,9 +2,9 @@
 
 This repo contains code from different books/sources. They are:
 
-1. Exploratory Data Analysis (EDA) course at Indiana University (STAT-S 670)
-2. R for Data Science code snippets
-3. Data Analysis with R by Udacity
+1. *Exploratory Data Analysis (EDA)* course at **Indiana University (STAT-S 670)**
+2. *R for Data Science* code snippets
+3. *Data Analysis with R* by Udacity
 
 With R and RStudio installed on your local machine the packages required to run the code in this repo can be installed using the commands below in a RStudio. (Note: It is not recommended to install R using homebrew on macOS)
 
