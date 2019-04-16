@@ -1,4 +1,4 @@
-## Exploratory_Data_Analysis
+## Exploratory Data Analysis
 
 This repo contains code from different books/sources. They are:
 
